@@ -41,7 +41,7 @@ class wc_resultController extends AppBaseController
         $search_option=[];
         $search_info["tournaments"]=wc_tournament::all();
         $search_option["tournament_id"]=$request->input('tournament_id');
-        $search_info["rounds"]=wc_round::all();
+        //$search_info["rounds"]=wc_round::all();
         //if (!is_null($search_option["tournament_id"])&&$search_option["tournament_id"]!="null") {
         //$search_info["rounds"]=wc_round::where('tournament_id', '=', $search_option["tournament_id"])->get();
         //}
@@ -58,7 +58,7 @@ class wc_resultController extends AppBaseController
                 $wcResults->where('wc_tournament.id', $search_option["tournament_id"]);
             }
             if (!is_null($search_option["round_id"])&&$search_option["round_id"]!="null") {
-                $wcResults->where('wc_round.id', $search_option["round_id"]);
+                $wcResults->where('wc_round.knockout', $search_option["round_id"]);
             }
             if (!is_null($search_option["group_id"])&&$search_option["group_id"]!="null") {
                 $wcResults->where('wc_group.id', $search_option["group_id"]);

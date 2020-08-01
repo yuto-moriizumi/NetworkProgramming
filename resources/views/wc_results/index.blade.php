@@ -41,9 +41,8 @@
                     <label>ラウンドで絞る</label><br>
                     <select name="round_id">
                         <option value="null" selected>NONE</option>
-                        <?php foreach ($search_info["rounds"] as $option):?>
-                            <option value=<?=$option["id"]?>><?=$option["name"]?></option>
-                        <?php endforeach; ?>
+                        <option value="1">ノックアウト</option>
+                        <option value="2">グループ</option>
                     </select>
                 </div>  
             <div>
