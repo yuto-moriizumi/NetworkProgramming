@@ -39,5 +39,6 @@ Route::resource('wcRounds', 'wc_roundController');
 Route::resource('wcMatches', 'wc_matchController');
 
 Route::resource('wcResults', 'wc_resultController');
+Route::get('/api', 'wc_resultController@tournamentId2Teams');
 
 Route::resource('wcTeams', 'wc_teamController');
