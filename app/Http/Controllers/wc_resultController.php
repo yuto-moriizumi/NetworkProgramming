@@ -12,6 +12,8 @@ use Response;
 use App\Models\wc_result;
 use App\Models\wc_tournament;
 use App\Models\wc_round;
+use App\Models\wc_group;
+use App\Models\wc_team;
 
 class wc_resultController extends AppBaseController
 {
@@ -39,12 +41,43 @@ class wc_resultController extends AppBaseController
         $search_info["tournaments"]=wc_tournament::all();
         $search_option=[];
         $search_option["tournament_id"]=$request->input('tournament_id');
-        if (!is_null($search_option["tournament_id"])) {
+        if (!is_null($search_option["tournament_id"])&&$search_option["tournament_id"]!="null") {
             $search_info["rounds"]=wc_round::where('tournament_id', '=', $search_option["tournament_id"])->get();
         }
+        $search_option["round_id"]=$request->input('round_id');
+        $search_info["groups"]=wc_group::all();
+        $search_option["group_id"]=$request->input('group_id');
+        $search_info["teams"]=wc_team::all();
+        $search_option["team_id"]=$request->input('team_id');
+        $search_option["outcome"]=$request->input('outcome');
 
         if (is_null($team_id)) {
-            $wcResults = wc_result::select()->join('wc_match', 'wc_match.id', '=', 'wc_result.match_id')->join('wc_round', 'wc_round.id', '=', 'wc_match.round_id')->join('wc_tournament', 'wc_tournament.id', '=', 'wc_round.tournament_id')->join('wc_group', 'wc_group.id', '=', 'wc_match.group_id')->join('wc_team as wc_team0', 'wc_team0.id', '=', 'wc_result.team_id0')->join('wc_team as wc_team1', 'wc_team1.id', '=', 'wc_result.team_id1')->get();
+            $wcResults = wc_result::select()->join('wc_match', 'wc_match.id', '=', 'wc_result.match_id')->join('wc_round', 'wc_round.id', '=', 'wc_match.round_id')->join('wc_tournament', 'wc_tournament.id', '=', 'wc_round.tournament_id')->join('wc_group', 'wc_group.id', '=', 'wc_match.group_id')->join('wc_team as wc_team0', 'wc_team0.id', '=', 'wc_result.team_id0')->join('wc_team as wc_team1', 'wc_team1.id', '=', 'wc_result.team_id1');
+            if (!is_null($search_option["tournament_id"])&&$search_option["tournament_id"]!="null") {
+                $wcResults->where('wc_tournament.id', $search_option["tournament_id"]);
+            }
+            if (!is_null($search_option["round_id"])&&$search_option["round_id"]!="null") {
+                $wcResults->where('wc_round.id', $search_option["round_id"]);
+            }
+            if (!is_null($search_option["group_id"])&&$search_option["group_id"]!="null") {
+                $wcResults->where('wc_group.id', $search_option["group_id"]);
+            }
+            if (!is_null($search_option["team_id"])&&$search_option["team_id"]!="null") {
+                if (!is_null($search_option["outcome"])&&$search_option["outcome"]!="null") {
+                    if ($search_option["outcome"]==0) {
+                        $wcResults->whereRaw("team_id0 = ". $search_option["team_id"] ." AND count_stillmate = 1 OR team_id1 = ". $search_option["team_id"] ." AND count_stillmate = 1");
+                    }
+                    if ($search_option["outcome"]==1) {
+                        $wcResults->whereRaw("team_id0 = ". $search_option["team_id"] ." AND count_win = 1 OR team_id1 = ". $search_option["team_id"] ." AND count_lose = 1");
+                    }
+                    if ($search_option["outcome"]==-1) {
+                        $wcResults->whereRaw("team_id0 = ". $search_option["team_id"] ." AND count_lose = 1 OR team_id1 = ". $search_option["team_id"] ." AND count_win = 1");
+                    }
+                } else {
+                    $wcResults->whereRaw("team_id0 = ". $search_option["team_id"] ." OR team_id1 = ". $search_option["team_id"]);
+                }
+            }
+            $wcResults=$wcResults->get();
         } else { #チームIDが指定されている場合はそちらの検索を優先します
             //$wcResults = wc_result::where('team_id0', '=', $team_id)->where('count_win', '=', 1)->get();
             $wcResults = wc_result::whereRaw("team_id0 = ". $team_id ." AND count_win = 1 OR team_id1 = ". $team_id ." AND count_lose = 1")->get();

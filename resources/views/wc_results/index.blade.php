@@ -31,6 +31,7 @@
             <div>
                 <label>大会で絞る</label><br>
                 <select name="tournament_id">
+                    <option value="null" selected>NONE</option>
                     <?php foreach ($search_info["tournaments"] as $option):?>
                         <option value=<?=$option["id"]?>><?=$option["name"]?></option>
                     <?php endforeach; ?>
@@ -40,12 +41,40 @@
                 <div>
                     <label>ラウンドで絞る</label><br>
                     <select name="round_id">
+                        <option value="null" selected>NONE</option>
                         <?php foreach ($search_info["rounds"] as $option):?>
                             <option value=<?=$option["id"]?>><?=$option["name"]?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>                
             <?php endif; ?>
+            <div>
+                <label>グループで絞る</label><br>
+                <select name="group_id">
+                    <option value="null" selected>NONE</option>
+                    <?php foreach ($search_info["groups"] as $option):?>
+                        <option value=<?=$option["id"]?>><?=$option["name"]?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label>チームで絞る</label><br>
+                <select name="team_id">
+                    <option value="null" selected>NONE</option>
+                    <?php foreach ($search_info["teams"] as $option):?>
+                        <option value=<?=$option["id"]?>><?=$option["name"]?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label>勝敗で絞る</label><br>
+                <select name="outcome">
+                    <option value="null" selected>NONE</option>
+                    <option value="1">勝利</option>
+                    <option value="0">引き分け</option>
+                    <option value="-1">敗北</option>
+                </select>
+            </div>
             <div>
                 <input type="submit" value="Create" />
             </div>
