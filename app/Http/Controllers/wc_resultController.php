@@ -38,12 +38,13 @@ class wc_resultController extends AppBaseController
         $wcResults=null;
 
         $search_info=[];
-        $search_info["tournaments"]=wc_tournament::all();
         $search_option=[];
+        $search_info["tournaments"]=wc_tournament::all();
         $search_option["tournament_id"]=$request->input('tournament_id');
-        if (!is_null($search_option["tournament_id"])&&$search_option["tournament_id"]!="null") {
-            $search_info["rounds"]=wc_round::where('tournament_id', '=', $search_option["tournament_id"])->get();
-        }
+        $search_info["rounds"]=wc_round::all();
+        //if (!is_null($search_option["tournament_id"])&&$search_option["tournament_id"]!="null") {
+        //$search_info["rounds"]=wc_round::where('tournament_id', '=', $search_option["tournament_id"])->get();
+        //}
         $search_option["round_id"]=$request->input('round_id');
         $search_info["groups"]=wc_group::all();
         $search_option["group_id"]=$request->input('group_id');

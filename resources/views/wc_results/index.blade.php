@@ -30,15 +30,14 @@
             {{ csrf_field() }}
             <div>
                 <label>大会で絞る</label><br>
-                <select name="tournament_id">
+                <select id="tournament_id" name="tournament_id" onchange="onChange('tournament_id')">
                     <option value="null" selected>NONE</option>
                     <?php foreach ($search_info["tournaments"] as $option):?>
                         <option value=<?=$option["id"]?>><?=$option["name"]?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <?php if (array_key_exists("rounds", $search_info)):?>
-                <div>
+                <div id="round_id" style="display:none">
                     <label>ラウンドで絞る</label><br>
                     <select name="round_id">
                         <option value="null" selected>NONE</option>
@@ -46,8 +45,7 @@
                             <option value=<?=$option["id"]?>><?=$option["name"]?></option>
                         <?php endforeach; ?>
                     </select>
-                </div>                
-            <?php endif; ?>
+                </div>  
             <div>
                 <label>グループで絞る</label><br>
                 <select name="group_id">
@@ -59,14 +57,14 @@
             </div>
             <div>
                 <label>チームで絞る</label><br>
-                <select name="team_id">
+                <select id="team_id" name="team_id" onchange="onChange('team_id')">
                     <option value="null" selected>NONE</option>
                     <?php foreach ($search_info["teams"] as $option):?>
                         <option value=<?=$option["id"]?>><?=$option["name"]?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
+            <div id="outcome" style="display:none">
                 <label>勝敗で絞る</label><br>
                 <select name="outcome">
                     <option value="null" selected>NONE</option>
@@ -87,5 +85,24 @@
         <div class="text-center">
         
         </div>
+        <script>
+        function onChange(id){
+            const ind=document.getElementById(id).selectedIndex;
+            switch(id){
+                case 'tournament_id':
+                    console.log("hi",ind);
+                    if(ind>0) document.getElementById("round_id").style.display="block";
+                    else document.getElementById("round_id").style.display="none";
+                    break;
+                case 'team_id':
+                    console.log("hi",ind);
+                    if(ind>0) document.getElementById("outcome").style.display="block";
+                    else document.getElementById("outcome").style.display="none";
+                    break; 
+            }
+            
+            console.log(id);
+        }
+        </script>
     </div>
 @endsection
