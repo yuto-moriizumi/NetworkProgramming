@@ -19,7 +19,7 @@ Route::get('/', function () {
 
 Route::get('/index', 'HelloController@index');
 
-Route::resource('/wcGroups', 'wc_groupController');
+
 
 Auth::routes();
 
@@ -29,3 +29,15 @@ Route::get('/home', 'HomeController@index')->name('home');
 Auth::routes(['verify' => true]);
 
 Route::get('/home', 'HomeController@index')->middleware('verified');
+
+Route::resource('wcGroups', 'wc_groupController');
+
+Route::resource('wcTournaments', 'wc_tournamentController');
+
+Route::resource('wcRounds', 'wc_roundController');
+
+Route::resource('wcMatches', 'wc_matchController');
+
+Route::resource('wcResults', 'wc_resultController');
+
+Route::resource('wcTeams', 'wc_teamController');
