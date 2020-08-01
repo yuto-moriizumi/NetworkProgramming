@@ -19,5 +19,13 @@ Route::get('/', function () {
 
 Route::get('/index', 'HelloController@index');
 
+Route::resource('/wcGroups', 'wc_groupController');
 
-Route::resource('tests', 'testController');
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+
+Auth::routes(['verify' => true]);
+
+Route::get('/home', 'HomeController@index')->middleware('verified');
