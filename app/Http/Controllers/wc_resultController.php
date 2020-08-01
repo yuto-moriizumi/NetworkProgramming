@@ -235,12 +235,12 @@ class wc_resultController extends AppBaseController
 
         $output=[];
         foreach ($wcResults as $result) {
-            $output["hi"]="hi2";
             $output[$result->team_id0]=$result->wc_team0_name;
+            $output[$result->team_id1]=$result->wc_team1_name;
         }
-
+        
         return view('wc_results.api')
-            ->with('wcResults', $wcResults);
+            ->with('wcResults', json_encode($output));
 
         /**<?php foreach ($wcResults as $key=>$value):?>
     <?=$key.":".$value?>

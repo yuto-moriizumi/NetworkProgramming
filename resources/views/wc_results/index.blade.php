@@ -26,11 +26,11 @@
         </form>
         <p>チームID勝利検索：<?=$val?></p>
         <h2>高度な検索</h2>
-        <form action="" method="GET">
+        <form action="" method="GET" id="app">
             {{ csrf_field() }}
             <div>
                 <label>大会で絞る</label><br>
-                <select id="tournament_id" name="tournament_id" onchange="onChange('tournament_id')">
+                <select id="tournament_id" v-model="tournament_id" name="tournament_id" onchange="onChange('tournament_id')" @change="onTournamentChange">
                     <option value="null" selected>NONE</option>
                     <?php foreach ($search_info["tournaments"] as $option):?>
                         <option value=<?=$option["id"]?>><?=$option["name"]?></option>
@@ -56,11 +56,8 @@
             </div>
             <div>
                 <label>チームで絞る</label><br>
-                <select id="team_id" name="team_id" onchange="onChange('team_id')">
-                    <option value="null" selected>NONE</option>
-                    <?php foreach ($search_info["teams"] as $option):?>
-                        <option value=<?=$option["id"]?>><?=$option["name"]?></option>
-                    <?php endforeach; ?>
+                <select id="team_id" name="team_id" v-model="team_id" onchange="onChange('team_id')">
+                    <option v-for="(value,key) in teams" v-text="value" v-bind:value="key"></option>
                 </select>
             </div>
             <div id="outcome" style="display:none">
@@ -84,7 +81,33 @@
         <div class="text-center">
         
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
         <script>
+        const app=new Vue({
+            el:"#app",
+            data:{
+                teams:{},
+                test:["aea","aea"],
+            },
+            created:function(){
+                console.log("hihihi");
+            },
+            methods:{
+                onTournamentChange:function(){
+                    console.log("tournament change");
+                    const req=new XMLHttpRequest();
+                    req.open("GET", "./api?tournament_id="+tournament_id,false);//大変なので同期処理
+                    req.send(null);
+                    
+                    const res=JSON.parse(req.responseText);
+                    console.log(res);
+                    //this.$set(this, this.teams, res);
+                    res["null"]="NONE";
+                    this.teams=res;
+                    this.team_id="null";
+                }
+            }
+        });
         function onChange(id){
             const ind=document.getElementById(id).selectedIndex;
             switch(id){
