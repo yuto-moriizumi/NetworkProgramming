@@ -4,7 +4,7 @@
            <a class="btn btn-primary pull-right" style="margin-top: -10px;margin-bottom: 5px" href="{{ route('wcResults.create') }}">Add New</a>
         </h1>
     </section>
-    <script src="http://maps.google.com/maps/api/js?key=AIzaSyD1kEwZrEl7kEbYUyelohaGA0qqsulLi04"></script>
+    @include{'wc_results.script'}
     
     <div class="content" >
         <div class="clearfix"></div>
