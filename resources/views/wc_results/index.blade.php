@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('content')
     <section class="content-header">
         <h1 class="pull-left">Wc Results</h1>
@@ -69,7 +68,22 @@
             <div>
                 <input type="submit" value="Create" />
             </div>
+            
+            <div id="map"></div>
+            <style>
+            html {
+                height: 100%;
+            }
+            body {
+                height: 100%;
+            }
+            #map {
+                height: 100%;
+                width: 100%;
+            }
+        </style>
         </form>
+        
         <div class="box box-primary">
             <div class="box-body">
                     @include('wc_results.table')
@@ -78,8 +92,18 @@
         <div class="text-center">
         
         </div>
+        
+        <script src="http://maps.google.com/maps/api/js?key=AIzaSyD1kEwZrEl7kEbYUyelohaGA0qqsulLi04"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
         <script>
+        const MyLatLng = new google.maps.LatLng(35.6811673, 139.7670516);
+        const Options = {
+            zoom: 15,      //地図の縮尺値
+            center: MyLatLng,    //地図の中心座標
+            mapTypeId: 'roadmap'   //地図の種類
+        };
+        const map = new google.maps.Map(document.getElementById('map'), Options);
+
         const app=new Vue({
             el:"#app",
             data:{
