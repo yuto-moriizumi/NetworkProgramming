@@ -105,24 +105,21 @@
             },
             methods:{
                 onTournamentChange:function(){
-                    console.log(this.tournament_id,"tournament change");
-                    const req=new XMLHttpRequest();
-                    if(this.tournament_id=="null") req.open("GET", "./api?get=teams",false);//大変なので同期処理
-                    else req.open("GET", "./api?get=teams&tournament_id="+this.tournament_id,false);//大変なので同期処理
-                    req.send(null);                    
-                    const res=JSON.parse(req.responseText);
-
-                    console.log(res);
-                    res["null"]="NONE";
-                    this.teams=res;
-                    this.team_id="null";
-
+                    this.updateTeams();
                     if (this.round_id==2) { //グループ選択済みならそちらも更新
                         this.onRoundChange();
                     }
                 },
                 onRoundChange:function(){
-                    if(this.round_id!=2)this.group_show=false; //グループ試合が選択されていない場合は非表示
+                    this.updateTeams();
+                    if(this.round_id=="null"){
+                        this.group_show=false;//グループ試合が選択されていない場合は非表示
+                        return;
+                    }else if(this.round_id==1){
+                        this.group_show=false;//グループ試合が選択されていない場合は非表示
+                        return;
+                    }
+                    //グループ一覧を更新する
                     this.group_show=true;
 
                     const req=new XMLHttpRequest();
@@ -139,6 +136,19 @@
                 onTeamChange:function(){
                     if(this.team_id=="null") this.outcome_show=false;
                     else this.outcome_show=true;                    
+                },
+                updateTeams:function(){
+                    const req=new XMLHttpRequest();
+                    if(this.tournament_id=="null") req.open("GET", "./api?get=teams",false);//大会IDが指定されていない場合
+                    else if (this.round_id!=1)req.open("GET", "./api?get=teams&tournament_id="+this.tournament_id,false);//大会IDが指定されている場合
+                    else req.open("GET", "./api?get=teams&tournament_id="+this.tournament_id+"&round_knockout=1",false);//さらにノックアウトに絞る
+                    req.send(null);                    
+                    const res=JSON.parse(req.responseText);
+
+                    console.log(res);
+                    res["null"]="NONE";
+                    this.teams=res;
+                    this.team_id="null";
                 }
             }
         });

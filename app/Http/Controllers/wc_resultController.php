@@ -225,6 +225,7 @@ class wc_resultController extends AppBaseController
             case 'teams':
                 //トーナメントIDから参加したチーム一覧を取得する
                 $search_option["tournament_id"]=$request->input('tournament_id');
+                $search_option["round_knockout"]=$request->input('round_knockout');
 
                 $wcResults = wc_result::select("team_id0", "wc_team0.name as wc_team0_name", "team_id1", "wc_team1.name as wc_team1_name")
                     ->join('wc_match', 'wc_match.id', '=', 'wc_result.match_id')
@@ -234,6 +235,9 @@ class wc_resultController extends AppBaseController
                     ->join('wc_team as wc_team1', 'wc_team1.id', '=', 'wc_result.team_id1');
                 if (!is_null($search_option["tournament_id"])) {
                     $wcResults->where('tournament_id', $search_option["tournament_id"]);
+                }
+                if (!is_null($search_option["round_knockout"])) {
+                    $wcResults->where('wc_round.knockout', $search_option["round_knockout"]);
                 }
 
                 $wcResults =$wcResults->get();
