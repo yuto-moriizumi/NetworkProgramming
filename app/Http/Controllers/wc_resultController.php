@@ -221,26 +221,38 @@ class wc_resultController extends AppBaseController
 
     public function tournamentId2Teams(Request $request)
     {
-        //トーナメントIDから参加したチーム一覧を取得する
-        $search_option["tournament_id"]=$request->input('tournament_id');
+        switch ($request->input('get')) {
+            case 'teams':
+                //トーナメントIDから参加したチーム一覧を取得する
+                $search_option["tournament_id"]=$request->input('tournament_id');
 
-        $wcResults = wc_result::select("team_id0", "wc_team0.name as wc_team0_name", "team_id1", "wc_team1.name as wc_team1_name")
-            ->join('wc_match', 'wc_match.id', '=', 'wc_result.match_id')
-            ->join('wc_round', 'wc_round.id', '=', 'wc_match.round_id')
-            ->join('wc_tournament', 'wc_tournament.id', '=', 'wc_round.tournament_id')
-            ->join('wc_team as wc_team0', 'wc_team0.id', '=', 'wc_result.team_id0')
-            ->join('wc_team as wc_team1', 'wc_team1.id', '=', 'wc_result.team_id1');
-        $wcResults->where('tournament_id', $search_option["tournament_id"]);
-        $wcResults =$wcResults->get();
+                $wcResults = wc_result::select("team_id0", "wc_team0.name as wc_team0_name", "team_id1", "wc_team1.name as wc_team1_name")
+                    ->join('wc_match', 'wc_match.id', '=', 'wc_result.match_id')
+                    ->join('wc_round', 'wc_round.id', '=', 'wc_match.round_id')
+                    ->join('wc_tournament', 'wc_tournament.id', '=', 'wc_round.tournament_id')
+                    ->join('wc_team as wc_team0', 'wc_team0.id', '=', 'wc_result.team_id0')
+                    ->join('wc_team as wc_team1', 'wc_team1.id', '=', 'wc_result.team_id1');
+                if (!is_null($search_option["tournament_id"])) {
+                    $wcResults->where('tournament_id', $search_option["tournament_id"]);
+                }
 
-        $output=[];
-        foreach ($wcResults as $result) {
-            $output[$result->team_id0]=$result->wc_team0_name;
-            $output[$result->team_id1]=$result->wc_team1_name;
+                $wcResults =$wcResults->get();
+
+                $output=[];
+                foreach ($wcResults as $result) {
+                    $output[$result->team_id0]=$result->wc_team0_name;
+                    $output[$result->team_id1]=$result->wc_team1_name;
+                }
+                
+                return view('wc_results.api')
+                    ->with('wcResults', json_encode($output));
+                break;
+            
+            default:
+                return view('wc_results.api')->with('wcResults', "NULL");
+                break;
         }
-        
-        return view('wc_results.api')
-            ->with('wcResults', json_encode($output));
+
 
         /**<?php foreach ($wcResults as $key=>$value):?>
     <?=$key.":".$value?>

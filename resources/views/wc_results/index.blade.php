@@ -30,24 +30,24 @@
             {{ csrf_field() }}
             <div>
                 <label>大会で絞る</label><br>
-                <select id="tournament_id" v-model="tournament_id" name="tournament_id" onchange="onChange('tournament_id')" @change="onTournamentChange">
+                <select v-model="tournament_id" name="tournament_id" @change="onTournamentChange">
                     <option value="null" selected>NONE</option>
                     <?php foreach ($search_info["tournaments"] as $option):?>
                         <option value=<?=$option["id"]?>><?=$option["name"]?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-                <div id="round_id" style="display:none">
+                <div>
                     <label>ラウンドで絞る</label><br>
-                    <select name="round_id">
+                    <select name="round_id" v-model="round_id" @change="onRoundChange">
                         <option value="null" selected>NONE</option>
                         <option value="1">ノックアウト</option>
                         <option value="2">グループ</option>
                     </select>
                 </div>  
-            <div>
+            <div v-show="group_show">
                 <label>グループで絞る</label><br>
-                <select name="group_id">
+                <select name="group_id" v-model="group_id">
                     <option value="null" selected>NONE</option>
                     <?php foreach ($search_info["groups"] as $option):?>
                         <option value=<?=$option["id"]?>><?=$option["name"]?></option>
@@ -56,11 +56,11 @@
             </div>
             <div>
                 <label>チームで絞る</label><br>
-                <select id="team_id" name="team_id" v-model="team_id" onchange="onChange('team_id')">
+                <select name="team_id" v-model="team_id" @change="onTeamChange">
                     <option v-for="(value,key) in teams" v-text="value" v-bind:value="key"></option>
                 </select>
             </div>
-            <div id="outcome" style="display:none">
+            <div v-show="outcome_show">
                 <label>勝敗で絞る</label><br>
                 <select name="outcome">
                     <option value="null" selected>NONE</option>
@@ -86,17 +86,27 @@
         const app=new Vue({
             el:"#app",
             data:{
-                teams:{},
-                test:["aea","aea"],
+                teams:{
+                    <?php foreach ($search_info["teams"] as $option):?>
+                        <?=$option["id"]?>:"<?=$option["name"]?>",
+                    <?php endforeach; ?>
+                },
+                tournament_id:"null",
+                round_id:"null",
+                group_id:"null",
+                team_id:"null",
+                group_show:false,
+                outcome_show:false,
             },
             created:function(){
                 console.log("hihihi");
             },
             methods:{
                 onTournamentChange:function(){
-                    console.log("tournament change");
+                    console.log(this.tournament_id,"tournament change");
                     const req=new XMLHttpRequest();
-                    req.open("GET", "./api?tournament_id="+tournament_id,false);//大変なので同期処理
+                    if(this.tournament_id=="null") req.open("GET", "./api",false);//大変なので同期処理
+                    else req.open("GET", "./api?get=teams&tournament_id="+this.tournament_id,false);//大変なので同期処理
                     req.send(null);
                     
                     const res=JSON.parse(req.responseText);
@@ -105,26 +115,17 @@
                     res["null"]="NONE";
                     this.teams=res;
                     this.team_id="null";
+                },
+                onRoundChange:function(){
+                    if(this.round_id=="null") this.group_show=false;
+                    else this.group_show=true;
+                },
+                onTeamChange:function(){
+                    if(this.team_id=="null") this.outcome_show=false;
+                    else this.outcome_show=true;                    
                 }
             }
         });
-        function onChange(id){
-            const ind=document.getElementById(id).selectedIndex;
-            switch(id){
-                case 'tournament_id':
-                    console.log("hi",ind);
-                    if(ind>0) document.getElementById("round_id").style.display="block";
-                    else document.getElementById("round_id").style.display="none";
-                    break;
-                case 'team_id':
-                    console.log("hi",ind);
-                    if(ind>0) document.getElementById("outcome").style.display="block";
-                    else document.getElementById("outcome").style.display="none";
-                    break; 
-            }
-            
-            console.log(id);
-        }
         </script>
     </div>
 @endsection
