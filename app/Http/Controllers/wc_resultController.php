@@ -246,10 +246,28 @@ class wc_resultController extends AppBaseController
                 
                 return view('wc_results.api')
                     ->with('wcResults', json_encode($output));
-                break;
-            
+            case "groups":
+                $search_option["tournament_id"]=$request->input('tournament_id');
+
+                $wcResults = wc_group::select("wc_group.id as wc_group_id", "wc_group.name as wc_group_name")
+                ->join('wc_match', 'wc_match.group_id', '=', 'wc_group.id')
+                ->join('wc_round', 'wc_round.id', '=', 'wc_match.round_id')
+                ->join('wc_tournament', 'wc_tournament.id', '=', 'wc_round.tournament_id');
+                if (!is_null($search_option["tournament_id"])) {
+                    $wcResults->where('tournament_id', $search_option["tournament_id"]);
+                }
+                $wcResults =$wcResults->get();
+
+                $output=[];
+                foreach ($wcResults as $result) {
+                    $output[$result->wc_group_id]=$result->wc_group_name;
+                }
+                return view('wc_results.api')
+                ->with('wcResults', json_encode($output, JSON_UNESCAPED_UNICODE));
             default:
                 return view('wc_results.api')->with('wcResults', "NULL");
+
+                
                 break;
         }
 

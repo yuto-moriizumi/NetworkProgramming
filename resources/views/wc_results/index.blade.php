@@ -48,10 +48,7 @@
             <div v-show="group_show">
                 <label>グループで絞る</label><br>
                 <select name="group_id" v-model="group_id">
-                    <option value="null" selected>NONE</option>
-                    <?php foreach ($search_info["groups"] as $option):?>
-                        <option value=<?=$option["id"]?>><?=$option["name"]?></option>
-                    <?php endforeach; ?>
+                    <option v-for="(value,key) in groups" v-text="value" v-bind:value="key"></option>   
                 </select>
             </div>
             <div>
@@ -91,6 +88,11 @@
                         <?=$option["id"]?>:"<?=$option["name"]?>",
                     <?php endforeach; ?>
                 },
+                groups:{
+                    <?php foreach ($search_info["groups"] as $option):?>
+                        <?=$option["id"]?>:"<?=$option["name"]?>",
+                    <?php endforeach; ?>
+                },
                 tournament_id:"null",
                 round_id:"null",
                 group_id:"null",
@@ -105,20 +107,34 @@
                 onTournamentChange:function(){
                     console.log(this.tournament_id,"tournament change");
                     const req=new XMLHttpRequest();
-                    if(this.tournament_id=="null") req.open("GET", "./api",false);//大変なので同期処理
+                    if(this.tournament_id=="null") req.open("GET", "./api?get=teams",false);//大変なので同期処理
                     else req.open("GET", "./api?get=teams&tournament_id="+this.tournament_id,false);//大変なので同期処理
-                    req.send(null);
-                    
+                    req.send(null);                    
                     const res=JSON.parse(req.responseText);
+
                     console.log(res);
-                    //this.$set(this, this.teams, res);
                     res["null"]="NONE";
                     this.teams=res;
                     this.team_id="null";
+
+                    if (this.round_id==2) { //グループ選択済みならそちらも更新
+                        this.onRoundChange();
+                    }
                 },
                 onRoundChange:function(){
-                    if(this.round_id=="null") this.group_show=false;
-                    else this.group_show=true;
+                    if(this.round_id!=2)this.group_show=false; //グループ試合が選択されていない場合は非表示
+                    this.group_show=true;
+
+                    const req=new XMLHttpRequest();
+                    if(this.tournament_id=="null") req.open("GET", "./api?get=groups",false);//大変なので同期処理
+                    else req.open("GET", "./api?get=groups&tournament_id="+this.tournament_id,false);//大変なので同期処理
+                    req.send(null);
+                    const res=JSON.parse(req.responseText);
+
+                    console.log(res);
+                    res["null"]="NONE";
+                    this.groups=res;
+                    this.group_id="null";
                 },
                 onTeamChange:function(){
                     if(this.team_id=="null") this.outcome_show=false;
