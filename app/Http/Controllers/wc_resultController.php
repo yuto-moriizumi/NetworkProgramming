@@ -53,7 +53,7 @@ class wc_resultController extends AppBaseController
         $search_option["outcome"]=$request->input('outcome');
 
         if (is_null($team_id)) {
-            $wcResults = wc_result::select()->join('wc_match', 'wc_match.id', '=', 'wc_result.match_id')->join('wc_round', 'wc_round.id', '=', 'wc_match.round_id')->join('wc_tournament', 'wc_tournament.id', '=', 'wc_round.tournament_id')->join('wc_group', 'wc_group.id', '=', 'wc_match.group_id')->join('wc_team as wc_team0', 'wc_team0.id', '=', 'wc_result.team_id0')->join('wc_team as wc_team1', 'wc_team1.id', '=', 'wc_result.team_id1');
+            $wcResults = wc_result::select("*", "wc_team0.id as wc_team0_id", "wc_team1.id as wc_team1_id", "wc_team0.lat as wc_team0_lat", "wc_team0.lng as wc_team0_lng", "wc_team1.lat as wc_team1_lat", "wc_team1.lng as wc_team1_lng")->join('wc_match', 'wc_match.id', '=', 'wc_result.match_id')->join('wc_round', 'wc_round.id', '=', 'wc_match.round_id')->join('wc_tournament', 'wc_tournament.id', '=', 'wc_round.tournament_id')->join('wc_group', 'wc_group.id', '=', 'wc_match.group_id')->join('wc_team as wc_team0', 'wc_team0.id', '=', 'wc_result.team_id0')->join('wc_team as wc_team1', 'wc_team1.id', '=', 'wc_result.team_id1');
             if (!is_null($search_option["tournament_id"])&&$search_option["tournament_id"]!="null") {
                 $wcResults->where('wc_tournament.id', $search_option["tournament_id"]);
             }
@@ -79,6 +79,11 @@ class wc_resultController extends AppBaseController
                 }
             }
             $wcResults=$wcResults->get();
+            $search_info["countries"]=[];
+            foreach ($wcResults as $result) {
+                array_push($search_info["countries"], ["id"=>$result->wc_team0_id,"lat"=>$result->wc_team0_lat,"lng"=>$result->wc_team0_lng]);
+                array_push($search_info["countries"], ["id"=>$result->wc_team1_id,"lat"=>$result->wc_team1_lat,"lng"=>$result->wc_team1_lng]);
+            }
         } else { #チームIDが指定されている場合はそちらの検索を優先します
             //$wcResults = wc_result::where('team_id0', '=', $team_id)->where('count_win', '=', 1)->get();
             $wcResults = wc_result::whereRaw("team_id0 = ". $team_id ." AND count_win = 1 OR team_id1 = ". $team_id ." AND count_lose = 1")->get();

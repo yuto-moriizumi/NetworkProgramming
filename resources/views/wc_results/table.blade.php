@@ -26,7 +26,7 @@
         </thead>
         <tbody>
         @foreach($wcResults as $wcResult)
-            <tr>
+            <tr @click="hello([{{$wcResult->wc_team0_id}},{{$wcResult->wc_team1_id}}])">
                 <td>{{ $wcResult->match_id }}</td>
             <td>{{ $wcResult->team_id0 }}</td>
             <td>{{ $wcResult->team_id1 }}</td>
